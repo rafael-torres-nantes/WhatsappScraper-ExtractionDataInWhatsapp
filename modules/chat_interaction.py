@@ -114,10 +114,10 @@ class ChatInteraction:
         
         except Exception as e:
             print(f"[DEBUG] Método de rolagem PAGE_UP falhou: {str(e)}")
-            
+        
         print("[WARNING] Cuidado: Talvez algumas mensagens não tenham sido carregadas.")
     
-    def find_first_message(self):
+    def find_message(self):
         """
         Tenta encontrar o botão "Carregar mensagens anteriores" ou a primeira mensagem.
         Se encontrar o botão, clica nele para carregar mais mensagens.
@@ -151,7 +151,7 @@ class ChatInteraction:
             return False
             
         except Exception as e:
-            print(f"[DEBUG] Erro ao tentar encontrar mensagens anteriores: {str(e)}")
+            print(f"[DEBUG] Não foi possível encontrar o botão de carregar mensagens")
             return False
     
     def load_all_messages(self, max_attempts=100):
@@ -170,7 +170,10 @@ class ChatInteraction:
         for i in range(max_attempts):
             print(f"[DEBUG] Tentativa {i + 1}/{max_attempts} de carregar mais mensagens antigas")
             
-            found_more = self.find_first_message()
+            # Primeiro tenta a rolagem básica
+            self.scroll_to_top()
+        
+            found_more = self.find_message()
             
             if not found_more:
 
@@ -185,6 +188,7 @@ class ChatInteraction:
                     # Alternativa com JavaScript
                     self.driver.execute_script("window.scrollTo(0, 0);")
                     time.sleep(2)
+                
                 except Exception as e:
                     print(f"[DEBUG] Falha na rolagem adicional: {str(e)}")
             
