@@ -96,7 +96,7 @@ class ChatInteraction:
         """
         print("[DEBUG] Iniciando carregamento de mensagens antigas...")
           
-        # Método 1: Usar o PAGE_UP do teclado
+        # Método 1: Usar o HOME do teclado
         try:
             # Clica no contêiner de mensagens primeiro para focar
             body = self.driver.find_element(By.TAG_NAME, "body")
@@ -108,12 +108,11 @@ class ChatInteraction:
             scroll_attempts = 100
             
             for i in range(scroll_attempts):
-                actions.send_keys(Keys.PAGE_UP).perform()
-                print(f"[DEBUG] Rolagem usando PAGE_UP {i + 1}/{scroll_attempts}")
+                actions.send_keys(Keys.HOME).perform()
                 time.sleep(0.1)  # Espera um pouco entre as rolagens
-        
+                
         except Exception as e:
-            print(f"[DEBUG] Método de rolagem PAGE_UP falhou: {str(e)}")
+            print(f"[DEBUG] Método de rolagem HOME falhou: {str(e)}")
         
         print("[WARNING] Cuidado: Talvez algumas mensagens não tenham sido carregadas.")
     
@@ -123,6 +122,10 @@ class ChatInteraction:
         Se encontrar o botão, clica nele para carregar mais mensagens.
         """
         try:
+            # Comando para rolar para o topo da conversa
+            actions = ActionChains(self.driver)
+            actions.send_keys(Keys.HOME).perform()
+
             # Tenta encontrar o botão "Carregar mensagens anteriores"
             # Os XPaths podem variar de acordo com a versão do WhatsApp Web
             load_more_selectors = [
@@ -144,6 +147,7 @@ class ChatInteraction:
                     print("[DEBUG] Botão 'Carregar mensagens anteriores' encontrado e clicado")
                     time.sleep(5)  # Espera carregar as mensagens
                     return True
+                
                 except (TimeoutException, NoSuchElementException, StaleElementReferenceException):
                     continue
             
@@ -161,37 +165,24 @@ class ChatInteraction:
         Args:
             max_attempts (int): Número máximo de tentativas
         """
-        print("[INFO] Iniciando carregamento completo do histórico de mensagens...")
-        
-        # Primeiro tenta a rolagem básica
-        self.scroll_to_top()
-        
-        # Depois procura por botões de carregar mais mensagens
-        for i in range(max_attempts):
-            print(f"[DEBUG] Tentativa {i + 1}/{max_attempts} de carregar mais mensagens antigas")
+        print("[INFO] Iniciando carregamento completo do histórico de mensagens...")      
             
-            # Primeiro tenta a rolagem básica
-            self.scroll_to_top()
+        # Permite que o usuário role para cima manualmente
+        loading_messages = True
         
-            found_more = self.find_message()
-            
-            if not found_more:
+        # Número máximo de tentativas para rolar e carregar mensagens
+        max_attempt = 5 
 
-                # Se não encontrou botão, tenta rolar mais
-                try:
-                    # Tenta vários seletores para encontrar o container
-                    body = self.driver.find_element(By.TAG_NAME, "body")
-                    actions = ActionChains(self.driver)
-                    actions.move_to_element(body).send_keys(Keys.HOME).perform()
-                    time.sleep(2)
-                    
-                    # Alternativa com JavaScript
-                    self.driver.execute_script("window.scrollTo(0, 0);")
-                    time.sleep(2)
-                
-                except Exception as e:
-                    print(f"[DEBUG] Falha na rolagem adicional: {str(e)}")
+        # Lógica para continuar rolando até que não haja mais mensagens a carregar
+        while loading_messages and max_attempt > 0:
             
-            time.sleep(2)  # Pausa entre tentativas
-        
+            # Aguarda um pouco para garantir que as mensagens sejam carregadas
+            self.scroll_to_top()
+
+            # Verifica novamente se o botão de carregar mensagens ainda está presente
+            loading_messages = self.find_message()
+
+            # Aumenta o contador de tentativas
+            max_attempt -= 1
+    
         print("[INFO] Processo de carregamento de mensagens antigas concluído")
