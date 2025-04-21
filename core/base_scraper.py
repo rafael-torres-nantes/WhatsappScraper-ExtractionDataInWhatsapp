@@ -133,7 +133,7 @@ class WhatsappScraper:
             print(f"[DEBUG] Diretórios criados: {group_dir}")
             
             # Rola para cima para carregar mensagens mais antigas
-            self.chat_interaction.scroll_to_top()
+            self.chat_interaction.load_all_messages()
             
             # Extrai as mensagens
             messages = []
