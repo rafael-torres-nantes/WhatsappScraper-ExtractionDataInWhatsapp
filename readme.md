@@ -35,7 +35,7 @@ O sistema utiliza a classe [`WhatsappScraper`](core/base_scraper.py) para gerenc
 
 * **Interação com Chats:** A classe [`ChatInteraction`](modules/chat_interaction.py) gerencia a busca por contatos, envio de mensagens e carregamento de mensagens antigas.
 * **Extração de Mensagens:** A classe [`ContentExtractor`](modules/content_extractor.py) é responsável por extrair remetentes, timestamps, textos, imagens e documentos das mensagens.
-* **Carregamento de Mensagens Antigas:** Métodos como `scroll_to_top` e `find_first_message` garantem que o histórico completo de mensagens seja carregado.
+* **Carregamento de Mensagens Antigas:** Métodos como `scroll_to_top` e `find_message` garantem que o histórico completo de mensagens seja carregado.
 
 ### 🎨 Parte 2 - Gerenciamento de Arquivos
 
