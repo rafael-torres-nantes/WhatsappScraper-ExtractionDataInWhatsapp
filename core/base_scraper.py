@@ -127,7 +127,7 @@ class WhatsappScraper:
             if not self.chat_interaction.find_chat(group_name):
                 print(f"[ERROR] Não foi possível encontrar o grupo: {group_name}")
                 return False
-                
+            
             # Cria diretórios para o grupo
             group_dir, images_dir, docs_dir, messages_file = self.file_manager.create_group_directories(group_name)
             print(f"[DEBUG] Diretórios criados: {group_dir}")
@@ -141,9 +141,12 @@ class WhatsappScraper:
             docs_count = 0
             
             # Obtém todos os elementos de mensagem
+            self.content_extractor.get_messages_by_date()
+            sleep(1000)
+            
             message_elements = self.content_extractor.get_all_messages()
             print(f"[DEBUG] Encontradas {len(message_elements)} mensagens para processar")
-            sleep(200)
+            sleep(1000)
             
             # Processa cada mensagem
             for msg_element in message_elements:
@@ -217,7 +220,7 @@ class WhatsappScraper:
         results = {}
         
         for group_name in group_list:
-            print(f"[INFO] Iniciando extração do grupo: {group_name}")
+            print(f"[DEBUG] Iniciando extração do grupo: {group_name}")
             success = self.extract_group_content(group_name)
             results[group_name] = success
             
