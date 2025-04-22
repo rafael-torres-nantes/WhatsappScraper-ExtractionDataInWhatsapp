@@ -7,6 +7,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
 
+from config.settings import TIME_WAIT
+
 class ChatInteraction:
     """
     Gerencia interações com chats e contatos no WhatsApp Web.
@@ -27,18 +29,18 @@ class ChatInteraction:
         """
         try:
             # Clica na barra de pesquisa
-            search_box = WebDriverWait(self.driver, 10).until(
+            search_box = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.XPATH, '//div[@aria-label="Caixa de texto de pesquisa"]'))
             )
             search_box.click()
             search_box.clear()
             search_box.send_keys(contact_name)
             
-            time.sleep(2)  # Aguarda a busca ser realizada
+            time.sleep(TIME_WAIT * 2)  # Aguarda a busca ser realizada
             
             # Tenta encontrar o contato na lista de resultados
             try:
-                contact = WebDriverWait(self.driver, 10).until(
+                contact = WebDriverWait(self.driver, 30).until(
                     EC.presence_of_element_located((By.XPATH, f'//span[@title="{contact_name}"]'))
                 )
                 contact.click()
@@ -113,8 +115,6 @@ class ChatInteraction:
                 
         except Exception as e:
             print(f"[DEBUG] Método de rolagem HOME falhou: {str(e)}")
-        
-        print("[WARNING] Cuidado: Talvez algumas mensagens não tenham sido carregadas.")
     
     def find_message(self):
         """
@@ -165,13 +165,13 @@ class ChatInteraction:
         Args:
             max_attempts (int): Número máximo de tentativas
         """
-        print("[INFO] Iniciando carregamento completo do histórico de mensagens...")      
+        print("[DEBUG] Iniciando carregamento completo do histórico de mensagens...")      
             
         # Permite que o usuário role para cima manualmente
         loading_messages = True
         
         # Número máximo de tentativas para rolar e carregar mensagens
-        max_attempt = 5 
+        max_attempt = 1 
 
         # Lógica para continuar rolando até que não haja mais mensagens a carregar
         while loading_messages and max_attempt > 0:
@@ -185,4 +185,4 @@ class ChatInteraction:
             # Aumenta o contador de tentativas
             max_attempt -= 1
     
-        print("[INFO] Processo de carregamento de mensagens antigas concluído")
+        print("[DEBUG] Processo de carregamento de mensagens antigas concluído")
