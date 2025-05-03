@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException
 
 from utils.timestamp_regex import get_timestamp_regex
+import re
 
 class ContentExtractor:
     """
@@ -31,6 +32,10 @@ class ContentExtractor:
         Args:
             date (str): Data da conversa no formato "dd/mm/yyyy"
         """
+
+        # Cria uma lista para armazenar as mensagens
+        messages = []
+
         try:
             # Obtém as datas das mensagens
             list_messages_date = self.driver.find_elements(By.XPATH, '//div[@class="_amjw _amk1 _aotl  focusable-list-item"]')
@@ -55,10 +60,39 @@ class ContentExtractor:
                         """,
                         first_element, second_element
                     )
-                    
-                    print(html_between.strip())
 
-            return html_between.strip()
+                    # Separe o HTML extraído em partes
+                    html_between_list = html_between.split('tail-out')
+                    html_between_list = [part.split('msg-check')[0] for part in html_between_list if 'msg-check' in part]
+
+                    # Percorre cada parte do HTML extraído
+                    for string_html in html_between_list:
+                        
+                        # Define regex mais flexível para capturar diferentes formatos de timestamps
+                        timestamp_regex_XX_XXXX_XX = r'\d{2}:\d{2}\d{2}:\d{2}'
+                        timestamp_regex_XX_XX = r'(?<!\d{2}:\d{2})\d{2}:\d{2}(?!\d{2}:\d{2})'
+
+                        # Verifica se o timestamp está no formato "XX:XX" ou "XX:XX:XX"
+                        timestamp_regex = re.search(timestamp_regex_XX_XX, string_html) or re.search(timestamp_regex_XX_XXXX_XX, string_html)
+                        
+                        # Checa se o timestamp foi encontrado
+                        if timestamp_regex:
+                            # Remove os caracteres indesejados do message_text
+                            message_text = string_html.replace(timestamp_regex.group(), '')
+                            
+                            # Extrai a data da string
+                            data_time = timestamp_regex.group()
+
+                        # Armazena o HTML extraído na lista de resultados
+                        messages.append({
+                            "date": first_element.text.strip(),
+                            "message_text": message_text,
+                            "timestamp": data_time
+                        })
+
+                        print(f"[DEBUG] Mensagem extraída: {messages[-1]}")
+
+            return messages
 
         except:
             print("[ERROR] Erro ao obter mensagens por data.")
