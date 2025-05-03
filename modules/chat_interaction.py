@@ -36,13 +36,14 @@ class ChatInteraction:
             search_box.clear()
             search_box.send_keys(contact_name)
             
-            time.sleep(TIME_WAIT * 2)  # Aguarda a busca ser realizada
+            time.sleep(TIME_WAIT)  # Aguarda a busca ser realizada
             
             # Tenta encontrar o contato na lista de resultados
             try:
                 contact = WebDriverWait(self.driver, 30).until(
-                    EC.presence_of_element_located((By.XPATH, f'//span[@title="{contact_name}"]'))
+                    EC.element_to_be_clickable((By.XPATH, f'//span[@title="{contact_name}"]'))
                 )
+                time.sleep(TIME_WAIT)
                 contact.click()
                 print(f"[DEBUG] Contato '{contact_name}' encontrado e selecionado!")
                 return True
