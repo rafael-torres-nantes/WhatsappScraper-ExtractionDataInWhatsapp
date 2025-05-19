@@ -141,7 +141,8 @@ class WhatsappScraper:
             docs_count = 0
             
             # Obtém todos os elementos de mensagem
-            self.content_extractor.get_messages_by_date()
+            messages = self.content_extractor.get_messages_by_date()
+            print(f"[DEBUG] Encontradas {len(messages)} mensagens para processar")
             sleep(1000)
             
             message_elements = self.content_extractor.get_all_messages()

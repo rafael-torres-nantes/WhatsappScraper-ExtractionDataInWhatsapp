@@ -60,6 +60,7 @@ class ContentExtractor:
                         """,
                         first_element, second_element
                     )
+                    print(f"[DEBUG] HTML entre os elementos: {html_between}")
 
                     # Separe o HTML extraído em partes
                     html_between_list = html_between.split('tail-out')
@@ -262,9 +263,10 @@ class ContentExtractor:
         try:
             # Procura por imagens na mensagem
             image_elements = message_element.find_elements(
-                By.XPATH, './/img[contains(@src, "blob:") or contains(@src, "https://")]'
+                By.XPATH, '//img[not(@tabindex="-1")]'
             )
             return [img.get_attribute('src') for img in image_elements if img.get_attribute('src')]
+        
         except Exception as e:
             print(f"[WARN] Não foi possível extrair imagens: {str(e)}")
             return []
